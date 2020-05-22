@@ -11,12 +11,14 @@ const routes = [
     name: "Home",
     component: Home
   },
+
   {
     path: "/note/:id",
     name: "ToDo Item",
     props: true,
     component: Note
   },
+
   {
     path: "*",
     redirect: "/"

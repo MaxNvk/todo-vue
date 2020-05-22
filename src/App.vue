@@ -1,7 +1,9 @@
 <template>
   <div id="app">
     <BaseHeader />
+
     <router-view />
+
     <AppModal />
   </div>
 </template>

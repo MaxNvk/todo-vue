@@ -36,7 +36,5 @@ export default new Vuex.Store({
 
       state.notes.splice(index, 1);
     }
-  },
-  actions: {},
-  modules: {}
+  }
 });
