@@ -1,18 +1,19 @@
 <template>
-  <div class="home">
-    <img alt="Vue logo" src="../assets/logo.png" />
-    <HelloWorld msg="Welcome to Your Vue.js App" />
-  </div>
+  <main class="container">
+    <NoteCard v-for="(note, key) in notes" :key="key" :note="note" />
+  </main>
 </template>
 
 <script>
-// @ is an alias to /src
-import HelloWorld from "@/components/HelloWorld.vue";
+import NoteCard from "@/components/NoteCard.vue";
 
 export default {
   name: "Home",
-  components: {
-    HelloWorld
+  components: { NoteCard },
+  computed: {
+    notes() {
+      return this.$store.state.notes;
+    }
   }
 };
 </script>

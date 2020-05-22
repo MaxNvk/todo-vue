@@ -1,0 +1,15 @@
+.button {
+  color: $black;
+  padding: 10px;
+  margin: 0 10px;
+  font-weight: 600;
+  background: lighten($black, 90);
+
+  &.save:hover {
+    background: lighten($blue, 28);
+  }
+
+  &.cancel:hover {
+    background: lighten($yellow, 28);
+  }
+}
