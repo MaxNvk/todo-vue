@@ -1,16 +1,25 @@
 <template>
-  <div v-if="isShown" class="modal">
-    <div class="modal-content text-center">
+  <div @keydown.esc="hide" v-if="isShown" class="modal">
+    <form class="modal-content text-center">
       <p class="modal-title">{{ title }}</p>
-      <button class="modal-close" @click="hide">
+      <button class="modal-close" tabindex="-1" @click="hide">
         <FontAwesomeIcon icon="times" />
       </button>
 
       <div class="modal-footer d-flex justify-center">
-        <button class="button save" @click="submit">Submit</button>
-        <button class="button cancel" @click="hide">Cancel</button>
+        <button
+          tabindex="0"
+          ref="submitButton"
+          class="button save"
+          @click="submit"
+        >
+          Submit
+        </button>
+        <button tabindex="0" class="button cancel" @click="hide">
+          Cancel
+        </button>
       </div>
-    </div>
+    </form>
   </div>
 </template>
 
@@ -19,8 +28,8 @@ import Modal from "@/plugins/modal.js";
 
 export default {
   data: () => ({
-    isShown: false,
     title: null,
+    isShown: false,
     onSubmit: {}
   }),
   beforeMount() {
@@ -29,10 +38,14 @@ export default {
     });
   },
   methods: {
-    show(params) {
+    async show(params) {
       this.isShown = true;
       this.title = params.title;
       this.onSubmit = params.onSubmit;
+
+      await this.$nextTick(() => {
+        this.$refs.submitButton.focus();
+      });
     },
     hide() {
       this.isShown = false;
@@ -57,7 +70,7 @@ export default {
   bottom: 0;
   right: 0;
   background: rgba($black, 0.5);
-  z-index: 2;
+  z-index: 3;
 }
 
 .modal-content {

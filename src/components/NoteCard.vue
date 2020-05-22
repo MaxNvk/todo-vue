@@ -1,19 +1,18 @@
 <template>
-  <div class="note-card d-flex flex-wrap">
+  <router-link :to="`/note/${note.id}`" class="note-card d-flex flex-wrap">
     <div class="d-flex w-100 justify-between">
-      <router-link :to="`/note/${note.id}`" class="note-card__title w-100">{{
-        note.title
-      }}</router-link>
+      <p class="note-card__title w-100">{{ note.title }}</p>
 
-      <RemoveButton @click.native="callModalRemoveNote" />
+      <RemoveButton @click.native.prevent="callModalRemoveNote" />
     </div>
 
-    <router-link :to="`/note/${note.id}`" class="w-100">
-      <div v-for="(item, key) in croppedTasks" :key="key">
+    <ul :to="`/note/${note.id}`" class="w-100">
+      <li v-for="(item, key) in croppedTasks" :key="key">
         <TodoItem v-model="croppedTasks[key]" :disabled="true" />
-      </div>
-    </router-link>
-  </div>
+      </li>
+      <li class="note-card__dots" v-if="this.note.tasks.length > 3">. . .</li>
+    </ul>
+  </router-link>
 </template>
 
 <script>
@@ -35,7 +34,7 @@ export default {
   methods: {
     callModalRemoveNote() {
       this.$modal.show({
-        title: "Are you sure want to remove note?",
+        title: `Are you sure want to remove "${this.note.title}" note?`,
         onSubmit: this.removeNote
       });
     },
@@ -51,8 +50,12 @@ export default {
   border: 4px dashed $black;
   background: darken($cyan, 8);
   border-radius: 8px;
-  padding: 30px;
   margin-bottom: 30px;
+  padding: 30px 15px;
+
+  @media (min-width: $min-md) {
+    padding: 30px;
+  }
 }
 
 .note-card__title {
@@ -60,5 +63,12 @@ export default {
   font-weight: 700;
   font-size: 24px;
   padding-bottom: 30px;
+}
+
+.note-card__dots {
+  font-size: 24px;
+  font-weight: 700;
+  color: $white;
+  padding-left: 45px;
 }
 </style>

@@ -1,7 +1,34 @@
 <template>
   <form @submit.prevent="saveChanges" class="container">
+    <div class="state-change-buttons d-flex">
+      <button
+        :disabled="currentStateId < 1"
+        type="button"
+        class="button"
+        @click.prevent="prevStep"
+        @blur="walkInTime = false"
+      >
+        <FontAwesomeIcon icon="chevron-left" /> Prev State
+      </button>
+
+      <button
+        :disabled="currentStateId + 1 === clonedStates.length"
+        type="button"
+        class="button"
+        @click.prevent="nextStep"
+        @blur="walkInTime = false"
+      >
+        Next State <FontAwesomeIcon icon="chevron-right" />
+      </button>
+    </div>
+
     <div class="d-flex">
-      <input class="note-title" type="text" v-model="note.title" />
+      <input
+        ref="noteTitle"
+        class="note-title"
+        type="text"
+        v-model="note.title"
+      />
 
       <RemoveButton
         class="ml-15"
@@ -12,6 +39,7 @@
 
     <div class="todos">
       <TodoItem
+        ref="todoItem"
         v-for="(item, i) in note.tasks"
         :key="i"
         v-model="note.tasks[i]"
@@ -21,21 +49,22 @@
       <AddButton class="w-100" @click.prevent.native="addTodo" />
     </div>
 
-    <div
-      v-if="changed && id != 'new'"
-      class="note-footer d-flex justify-center align-center"
-    >
-      <button class="button save" type="submit">Save changes</button>
+    <div v-if="changed" class="note-footer d-flex justify-center align-center">
+      <button
+        :disabled="note.title == null || !note.title.length"
+        class="button save"
+        type="submit"
+      >
+        Save changes
+      </button>
 
-      <button @click.prevent="callModalCancel" class="button cancel">
+      <button
+        v-if="id != 'new'"
+        @click.prevent="callModalCancel"
+        class="button cancel"
+      >
         Cancel changes
       </button>
-    </div>
-    <div
-      v-else-if="id == 'new'"
-      class="note-footer d-flex justify-center align-center"
-    >
-      <button class="button save" type="submit">Save changes</button>
     </div>
   </form>
 </template>
@@ -60,13 +89,17 @@ export default {
 
   async created() {
     if (this.id != "new") {
-      this.note = JSON.parse(JSON.stringify(this.stateNote));
-      await this.$nextTick();
-
-      this.changed = false;
+      this.note = this.cloneDeepObject(this.stateNote);
     } else {
       this.note.id = this.$store.getters.lastNoteId + 1;
     }
+
+    this.clonedStates.push(this.cloneDeepObject(this.note));
+
+    await this.$nextTick();
+
+    this.changed = false;
+    this.$refs.noteTitle.focus();
   },
 
   data: () => ({
@@ -75,11 +108,32 @@ export default {
       title: null,
       tasks: []
     },
+    currentStateId: 0,
+    clonedStates: [],
+    walkInTime: false,
 
     changed: false
   }),
 
   methods: {
+    cloneDeepObject(obj) {
+      return JSON.parse(JSON.stringify(obj));
+    },
+
+    prevStep() {
+      this.walkInTime = true;
+      this.currentStateId -= 1;
+
+      this.note = this.cloneDeepObject(this.clonedStates[this.currentStateId]);
+    },
+
+    nextStep() {
+      this.walkInTime = true;
+      this.currentStateId += 1;
+
+      this.note = this.cloneDeepObject(this.clonedStates[this.currentStateId]);
+    },
+
     saveChanges() {
       this.$store.commit("SAVE_NOTE", this.note);
       this.changed = false;
@@ -87,6 +141,10 @@ export default {
       if (this.id == "new") {
         this.$router.push(`/note/${this.note.id}`);
       }
+
+      this.walkInTime = false;
+      this.clonedStates = [this.note];
+      this.currentStateId = 0;
     },
 
     async cancelChanges() {
@@ -95,6 +153,9 @@ export default {
       await this.$nextTick();
 
       this.changed = false;
+      this.walkInTime = false;
+      this.clonedStates = this.clonedStates.slice(0, 1);
+      this.currentStateId = 0;
     },
 
     removeNote() {
@@ -104,7 +165,7 @@ export default {
 
     callModalRemoveNote() {
       this.$modal.show({
-        title: "Are you sure want to remove note?",
+        title: `Are you sure want to remove "${this.note.title}" note?`,
         onSubmit: this.removeNote
       });
     },
@@ -116,13 +177,19 @@ export default {
       });
     },
 
-    addTodo() {
+    async addTodo() {
       if (this.note.tasks.length) {
         const id = this.note.tasks[this.note.tasks.length - 1].id + 1;
         this.note.tasks.push({ id, title: "", value: "" });
       } else {
         this.note.tasks.push({ id: 0, title: "", value: "" });
       }
+
+      await this.$nextTick();
+
+      this.$refs.todoItem[
+        this.$refs.todoItem.length - 1
+      ].$refs.todoText.focus();
     },
 
     deleteTodo(id) {
@@ -130,16 +197,29 @@ export default {
       this.note.tasks.splice(index, 1);
     }
   },
+
   watch: {
     note: {
       handler(newVal, oldVal) {
-        if (oldVal != null) {
+        if (oldVal.id != null) {
           this.changed = true;
+
+          if (!this.walkInTime) {
+            if (this.currentStateId + 1 < this.clonedStates.length) {
+              this.clonedStates = this.clonedStates.slice(
+                0,
+                this.currentStateId + 1
+              );
+            }
+
+            this.clonedStates.push(this.cloneDeepObject(oldVal));
+            this.currentStateId += 1;
+          }
         }
       },
-      immediate: true,
       deep: true
     },
+
     id: {
       handler(newVal) {
         if (newVal == "new") {
@@ -163,13 +243,18 @@ export default {
   border-bottom: 3px dashed $black;
   width: 100%;
   margin-bottom: 60px;
+  outline: none;
 
   &:focus {
-    border-bottom: 3px dashed $blue;
+    border-bottom: 3px solid $blue;
   }
 }
 
 .note-footer {
   margin-top: 30px;
+}
+
+.state-change-buttons {
+  margin-bottom: 30px;
 }
 </style>

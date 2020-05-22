@@ -1,5 +1,5 @@
 <template>
-  <button :class="'size-' + size">
+  <button type="button" :class="'size-' + size">
     <FontAwesomeIcon icon="trash" />
   </button>
 </template>

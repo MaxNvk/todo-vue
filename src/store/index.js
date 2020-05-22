@@ -8,50 +8,7 @@ export default new Vuex.Store({
   strict: process.env.NODE_ENV !== "production",
   plugins: [createPersistedState()],
   state: {
-    notes: [
-      {
-        id: 0,
-        title: "Note 1.",
-        tasks: [
-          {
-            id: 0,
-            title: "Task 1",
-            value: true
-          },
-          {
-            id: 1,
-            title: "Task 2",
-            value: false
-          },
-          {
-            id: 2,
-            title: "Task 3",
-            value: false
-          },
-          {
-            id: 3,
-            title: "Task 4",
-            value: false
-          }
-        ]
-      },
-      {
-        id: 1,
-        title: "Note 2.",
-        tasks: [
-          {
-            id: 0,
-            title: "Task 1",
-            value: false
-          },
-          {
-            id: 1,
-            title: "Task 2",
-            value: false
-          }
-        ]
-      }
-    ]
+    notes: []
   },
   getters: {
     getNoteById: state => id => {

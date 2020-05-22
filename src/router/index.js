@@ -16,6 +16,10 @@ const routes = [
     name: "ToDo Item",
     props: true,
     component: Note
+  },
+  {
+    path: "*",
+    redirect: "/"
   }
 ];
 

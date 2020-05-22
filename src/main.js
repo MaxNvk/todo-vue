@@ -10,11 +10,21 @@ import {
   faTrash,
   faEdit,
   faCheck,
-  faTimes
+  faTimes,
+  faChevronLeft,
+  faChevronRight
 } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/vue-fontawesome";
 
-library.add(faPlusSquare, faTrash, faEdit, faCheck, faTimes);
+library.add(
+  faPlusSquare,
+  faTrash,
+  faEdit,
+  faCheck,
+  faTimes,
+  faChevronLeft,
+  faChevronRight
+);
 Vue.component("FontAwesomeIcon", FontAwesomeIcon);
 
 Vue.use(Modal);

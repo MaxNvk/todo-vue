@@ -4,7 +4,7 @@
 
     <div class="header__buttons d-flex">
       <router-link to="/note/new">
-        <AddButton />
+        <AddButton tabindex="-1" />
       </router-link>
     </div>
   </header>
@@ -29,7 +29,11 @@ export default {
   z-index: 2;
   background: $white;
   height: 70px;
-  padding: 0 40px;
+  padding: 0 15px;
+
+  @media (min-width: $min-md) {
+    padding: 0 40px;
+  }
 }
 
 .logo {

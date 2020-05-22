@@ -10,7 +10,6 @@
       :value="value.value.toString() == 'true' ? false : true"
       @input="update('value', $event.target.value)"
       :disabled="disabled"
-      hidden
     />
     <label
       class="phantom-checkbox d-flex justify-center align-center"
@@ -20,7 +19,7 @@
     </label>
 
     <input
-      ref="todoInput"
+      ref="todoText"
       class="todo-item__text"
       type="text"
       :value="value.title"
@@ -76,6 +75,7 @@ export default {
   flex-grow: 1;
   background: transparent;
   margin: 0 15px;
+  outline: none;
 
   &:disabled {
     border: none !important;
@@ -83,8 +83,15 @@ export default {
   }
 
   &:focus {
-    border-bottom: 2px dashed $blue;
+    border-bottom: 2px solid $blue;
   }
+}
+
+input[type="checkbox"] {
+  position: absolute;
+  opacity: 0;
+  pointer-events: none;
+  user-select: none;
 }
 
 .phantom-checkbox {
@@ -96,6 +103,10 @@ export default {
   input[type="checkbox"]:disabled + & {
     color: $white !important;
     border-color: $white !important;
+  }
+
+  input[type="checkbox"]:focus + & {
+    border-style: solid;
   }
 
   &:hover {
