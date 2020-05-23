@@ -36,8 +36,11 @@ export default {
   },
   methods: {
     callModalRemoveNote() {
+      // We can call function that will reveal our modal,
+      // and pass object params with all the information
       this.$modal.show({
         title: `Are you sure want to remove "${this.note.title}" note?`,
+        // we are passing callback method for our submit button
         onSubmit: this.removeNote
       });
     },

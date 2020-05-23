@@ -1,7 +1,8 @@
 <template>
   <div @keydown.esc="hide" v-if="isShown" class="modal">
-    <form class="modal-content text-center">
+    <div class="modal-content text-center">
       <p class="modal-title">{{ title }}</p>
+
       <button class="modal-close" tabindex="-1" @click="hide">
         <FontAwesomeIcon icon="times" />
       </button>
@@ -15,15 +16,18 @@
         >
           Submit
         </button>
+
         <button tabindex="0" class="button cancel" @click="hide">
           Cancel
         </button>
       </div>
-    </form>
+    </div>
   </div>
 </template>
 
 <script>
+// we must import our Modal plugin instance
+// because it contains reference to our Eventbus
 import Modal from "@/plugins/modal.js";
 
 export default {
@@ -33,16 +37,22 @@ export default {
     onSubmit: {}
   }),
   beforeMount() {
+    // here we need to listen for emited events
+    // we declared those events inside our plugin
     Modal.EventBus.$on("show", params => {
       this.show(params);
     });
   },
   methods: {
     async show(params) {
+      // making modal visible
       this.isShown = true;
+      // setting title
       this.title = params.title;
+      // setting callback function
       this.onSubmit = params.onSubmit;
 
+      // on next tick focus on submit button
       await this.$nextTick(() => {
         this.$refs.submitButton.focus();
       });
@@ -51,10 +61,13 @@ export default {
       this.isShown = false;
     },
     submit() {
+      // we must check if this.onSubmit is function
       if (typeof this.onSubmit === "function") {
+        // run passed function and then close the modal
         this.onSubmit();
         this.hide();
       } else {
+        // we only close the modal
         this.hide();
       }
     }

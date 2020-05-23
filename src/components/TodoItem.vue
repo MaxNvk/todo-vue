@@ -11,6 +11,7 @@
       @input="update('value', $event.target.value)"
       :disabled="disabled"
     />
+
     <label
       class="phantom-checkbox d-flex justify-center align-center"
       :for="`check-${value.id}`"
@@ -50,6 +51,7 @@ export default {
   methods: {
     update(key, value) {
       this.$emit("input", { ...this.value, [key]: value });
+      console.log({ ...this.value, [key]: value });
     },
     handleDeleteButton() {
       this.$emit("delete", this.value.id);
@@ -76,6 +78,12 @@ export default {
   background: transparent;
   margin: 0 15px;
   outline: none;
+
+  .done & {
+    text-decoration: line-through;
+    color: $green;
+    border-color: $green !important;
+  }
 
   &:disabled {
     border: none !important;

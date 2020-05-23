@@ -41,6 +41,7 @@
       />
 
       <RemoveButton
+        v-if="id != 'new'"
         class="ml-15"
         size="lg"
         @click.native="callModalRemoveNote"
@@ -110,6 +111,7 @@ export default {
       // If it is new note we set it new unique ID
       this.note.id = this.$store.getters.lastNoteId + 1;
     }
+
     // Clone started state of note into clonedStateds
     await this.$nextTick();
 
@@ -198,50 +200,73 @@ export default {
     },
 
     callModalRemoveNote() {
-      // Call modal show with passing of params to it
+      // We can call function that will reveal our modal,
+      // and pass object params with all the information
       this.$modal.show({
         title: `Are you sure want to remove "${this.note.title}" note?`,
+        // we are passing callback method for our submit button
         onSubmit: this.removeNote
       });
     },
 
     callModalCancel() {
-      // Call modal show with passing of params to it
+      // We can call function that will reveal our modal,
+      // and pass object params with all the information
       this.$modal.show({
         title: "Are you sure want to cancel changes?",
+        // we are passing callback method for our submit button
         onSubmit: this.cancelChanges
+      });
+    },
+
+    focusOnLastTodo() {
+      setTimeout(() => {
+        this.$refs.todoItem[
+          this.$refs.todoItem.length - 1
+        ].$refs.todoText.focus();
       });
     },
 
     async addTodo() {
       if (this.note.todos.length) {
-        // Add new to-do item to state with new id if
+        // Add new to-do item to state with new id if todos length > 0
         const id = this.note.todos[this.note.todos.length - 1].id + 1;
         this.note.todos.push({ id, title: "", value: "" });
       } else {
+        // Add new to-do item to state with id:0 if todos length = 0
         this.note.todos.push({ id: 0, title: "", value: "" });
       }
 
       await this.$nextTick();
 
-      this.$refs.todoItem[
-        this.$refs.todoItem.length - 1
-      ].$refs.todoText.focus();
+      // Focusing on new to-do input field
+      this.focusOnLastTodo();
     },
 
-    deleteTodo(id) {
+    async deleteTodo(id) {
       const index = this.note.todos.findIndex(task => task.id === id);
       this.note.todos.splice(index, 1);
+
+      await this.$nextTick();
+
+      if (this.note.todos.length) {
+        // Focusing on last to-do input field
+        this.focusOnLastTodo();
+      }
     }
   },
 
   watch: {
     note: {
       handler(newVal, oldVal) {
+        // Checking if the change was not the setting of started state
         if (oldVal.id != null) {
           this.changed = true;
 
           if (!this.walkInTime) {
+            // If was on 'changing' mode of current state, and
+            // it is not last state step, we crop 'clonedStates' array
+            // and then push the last state
             if (this.currentStateId + 1 < this.clonedStates.length) {
               this.clonedStates = this.clonedStates.slice(
                 0,
@@ -249,6 +274,7 @@ export default {
               );
             }
 
+            // Push the last state
             this.clonedStates.push(this.cloneDeepObject(oldVal));
             this.currentStateId += 1;
           }
@@ -256,9 +282,10 @@ export default {
       },
       deep: true
     },
-
     id: {
       handler(newVal) {
+        // If we turn from the page of single note to the
+        // page of creating of new note we must to reset note state in data
         if (newVal == "new") {
           this.note = {
             id: this.$store.getters.lastNoteId + 1,

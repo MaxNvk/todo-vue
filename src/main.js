@@ -2,6 +2,7 @@ import Vue from "vue";
 import App from "./App.vue";
 import router from "./router";
 import store from "./store";
+// import our modal plugin
 import Modal from "@/plugins/modal.js";
 
 import { library } from "@fortawesome/fontawesome-svg-core";
@@ -27,6 +28,7 @@ library.add(
 );
 Vue.component("FontAwesomeIcon", FontAwesomeIcon);
 
+// use modal plugin
 Vue.use(Modal);
 
 Vue.config.productionTip = false;
