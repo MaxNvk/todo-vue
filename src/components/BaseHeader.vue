@@ -3,9 +3,7 @@
     <router-link to="/" class="logo">ToDo-List</router-link>
 
     <div class="header__buttons d-flex">
-      <router-link to="/note/new">
-        <AddButton tabindex="-1" />
-      </router-link>
+      <AddButton to="/note/new" />
     </div>
   </header>
 </template>

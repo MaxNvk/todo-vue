@@ -1,8 +1,13 @@
 <template>
   <form @submit.prevent="saveChanges" class="container">
     <div class="state-change-buttons d-flex">
+      <!-- :disabled is active when currentStateId is equal to 0,
+        it means that 'clonedStates' array contains only first started state -->
+
+      <!-- @blur event changes 'walkInTime' option, which helps app to 
+        understand in which mode the note is -->
       <button
-        :disabled="currentStateId < 1"
+        :disabled="!currentStateId"
         type="button"
         class="button"
         @click.prevent="prevStep"
@@ -11,6 +16,11 @@
         <FontAwesomeIcon icon="chevron-left" /> Prev State
       </button>
 
+      <!-- :disabled is active when currentStateId is equal to 'clonedStates' array length,
+        it means that changed state of note is the last state -->
+
+      <!-- @blur event changes 'walkInTime' option, which helps app to 
+        understand in which mode the note is -->
       <button
         :disabled="currentStateId + 1 === clonedStates.length"
         type="button"
@@ -38,6 +48,8 @@
     </div>
 
     <div class="todos">
+      <!-- Binding v-model through croppedTasks[key] made because vue -->
+      <!-- doesn't allow binding directly to item when used v-for loop -->
       <TodoItem
         ref="todoItem"
         v-for="(item, i) in note.tasks"
@@ -58,6 +70,7 @@
         Save changes
       </button>
 
+      <!-- We hide 'Cancel changes' button when it's new note -->
       <button
         v-if="id != 'new'"
         @click.prevent="callModalCancel"
@@ -82,6 +95,7 @@ export default {
   },
 
   computed: {
+    // get relevant note by passing id to getter
     stateNote() {
       return this.$store.getters.getNoteById(this.id);
     }
@@ -89,16 +103,23 @@ export default {
 
   async created() {
     if (this.id != "new") {
+      // If it is existing note in "Edit" mode we clone it from state to edit duplicate
+      // and then save it if it needed
       this.note = this.cloneDeepObject(this.stateNote);
     } else {
+      // If it is new note we set it new unique ID
       this.note.id = this.$store.getters.lastNoteId + 1;
     }
-
-    this.clonedStates.push(this.cloneDeepObject(this.note));
-
+    // Clone started state of note into clonedStateds
     await this.$nextTick();
 
+    // Reset fields to default settings after state change
     this.changed = false;
+    // Clone started state of note into clonedStateds
+    this.clonedStates = [this.cloneDeepObject(this.note)];
+    this.currentStateId = 0;
+
+    // By default we focus on title input for start editing
     this.$refs.noteTitle.focus();
   },
 
@@ -116,54 +137,68 @@ export default {
   }),
 
   methods: {
+    // Created cloneDeepObject method for copying objects correctly
+    // to avoid code cuplication
     cloneDeepObject(obj) {
       return JSON.parse(JSON.stringify(obj));
     },
 
     prevStep() {
+      // Set 'on' mode of changing current step of note editing
       this.walkInTime = true;
       this.currentStateId -= 1;
 
+      // Go to the previous step of note state version
       this.note = this.cloneDeepObject(this.clonedStates[this.currentStateId]);
     },
 
     nextStep() {
+      // Set 'on' mode of changing current step of note editing
       this.walkInTime = true;
       this.currentStateId += 1;
 
+      // Go to the next step of note state version
       this.note = this.cloneDeepObject(this.clonedStates[this.currentStateId]);
     },
 
     saveChanges() {
+      // Save state of note
       this.$store.commit("SAVE_NOTE", this.note);
       this.changed = false;
 
+      // If it was 'new' note page, we turn to the page of this note
       if (this.id == "new") {
         this.$router.push(`/note/${this.note.id}`);
       }
 
+      // Reset fields to default settings after page change
       this.walkInTime = false;
       this.clonedStates = [this.note];
       this.currentStateId = 0;
     },
 
     async cancelChanges() {
+      // Reset fields to default
       this.note = JSON.parse(JSON.stringify(this.stateNote));
 
       await this.$nextTick();
 
       this.changed = false;
       this.walkInTime = false;
-      this.clonedStates = this.clonedStates.slice(0, 1);
+      this.clonedStates = [this.note];
       this.currentStateId = 0;
     },
 
     removeNote() {
+      // When we want to delete note at first we must go to front
+      // page for preventing an error, and then we call
+      // 'REMOVE_NOTE' mutation which removes relevant note from state
       this.$router.push("/");
       this.$store.commit("REMOVE_NOTE", this.note.id);
     },
 
     callModalRemoveNote() {
+      // Call modal show with passing of params to it
       this.$modal.show({
         title: `Are you sure want to remove "${this.note.title}" note?`,
         onSubmit: this.removeNote
@@ -171,6 +206,7 @@ export default {
     },
 
     callModalCancel() {
+      // Call modal show with passing of params to it
       this.$modal.show({
         title: "Are you sure want to cancel changes?",
         onSubmit: this.cancelChanges
@@ -179,6 +215,7 @@ export default {
 
     async addTodo() {
       if (this.note.tasks.length) {
+        // Add new to-do item to state with new id if
         const id = this.note.tasks[this.note.tasks.length - 1].id + 1;
         this.note.tasks.push({ id, title: "", value: "" });
       } else {
