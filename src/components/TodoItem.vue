@@ -40,7 +40,16 @@ export default {
   name: "TodoItem",
   components: { RemoveButton },
   props: {
-    value: Object,
+    value: {
+      type: Object,
+      default() {
+        return {
+          id: null,
+          title: null,
+          value: false
+        };
+      }
+    },
     disabled: {
       type: Boolean,
       default() {
