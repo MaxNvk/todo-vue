@@ -6,8 +6,8 @@
     <input
       :id="`check-${value.id}`"
       type="checkbox"
-      :checked="value.value.toString() == 'true'"
-      :value="value.value.toString() == 'true' ? false : true"
+      :checked="value.value == 'true'"
+      :value="value.value == 'true' ? false : true"
       @input="update('value', $event.target.value)"
       :disabled="disabled"
     />
@@ -16,7 +16,7 @@
       class="phantom-checkbox d-flex justify-center align-center"
       :for="`check-${value.id}`"
     >
-      <FontAwesomeIcon icon="check" v-if="value.value.toString() == 'true'" />
+      <FontAwesomeIcon icon="check" v-if="value.value == 'true'" />
     </label>
 
     <input
@@ -51,7 +51,6 @@ export default {
   methods: {
     update(key, value) {
       this.$emit("input", { ...this.value, [key]: value });
-      console.log({ ...this.value, [key]: value });
     },
     handleDeleteButton() {
       this.$emit("delete", this.value.id);
