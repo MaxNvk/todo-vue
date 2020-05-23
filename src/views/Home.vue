@@ -1,6 +1,6 @@
 <template>
   <main class="container">
-    <NoteCard v-for="(note, key) in notes" :key="key" :note="note" />
+    <NoteCard v-for="note in notes" :key="note.id" :note="note" />
     <AddButton
       v-if="!notes.length"
       class="w-100"

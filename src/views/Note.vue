@@ -53,9 +53,9 @@
       <!-- doesn't allow binding directly to item when used v-for loop -->
       <TodoItem
         ref="todoItem"
-        v-for="(item, i) in note.todos"
-        :key="i"
-        v-model="note.todos[i]"
+        v-for="item in note.todos"
+        :key="item.id"
+        v-model="note.todos[item.id]"
         @delete="deleteTodo"
       />
 

@@ -7,10 +7,10 @@
     </div>
 
     <ul :to="`/note/${note.id}`" class="w-100">
-      <li v-for="(item, key) in croppedTodos" :key="key">
+      <li v-for="item in croppedTodos" :key="item.id">
         <!-- Binding v-model through croppedTodos[key] made because vue -->
         <!-- doesn't allow binding directly to item when used v-for loop -->
-        <TodoItem v-model="croppedTodos[key]" :disabled="true" />
+        <TodoItem v-model="croppedTodos[item.id]" :disabled="true" />
       </li>
       <li class="note-card__dots" v-if="this.note.todos.length > 3">. . .</li>
     </ul>
