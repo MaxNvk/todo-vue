@@ -7,12 +7,12 @@
     </div>
 
     <ul :to="`/note/${note.id}`" class="w-100">
-      <li v-for="(item, key) in croppedTasks" :key="key">
-        <!-- Binding v-model through croppedTasks[key] made because vue -->
+      <li v-for="(item, key) in croppedTodos" :key="key">
+        <!-- Binding v-model through croppedTodos[key] made because vue -->
         <!-- doesn't allow binding directly to item when used v-for loop -->
-        <TodoItem v-model="croppedTasks[key]" :disabled="true" />
+        <TodoItem v-model="croppedTodos[key]" :disabled="true" />
       </li>
-      <li class="note-card__dots" v-if="this.note.tasks.length > 3">. . .</li>
+      <li class="note-card__dots" v-if="this.note.todos.length > 3">. . .</li>
     </ul>
   </router-link>
 </template>
@@ -30,8 +30,8 @@ export default {
   },
   computed: {
     // crop to-do items to leave 3 items for showing cropped variant
-    croppedTasks() {
-      return this.note.tasks.slice(0, 3);
+    croppedTodos() {
+      return this.note.todos.slice(0, 3);
     }
   },
   methods: {

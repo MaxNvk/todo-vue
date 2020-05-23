@@ -48,13 +48,13 @@
     </div>
 
     <div class="todos">
-      <!-- Binding v-model through croppedTasks[key] made because vue -->
+      <!-- Binding v-model through croppedTodos[key] made because vue -->
       <!-- doesn't allow binding directly to item when used v-for loop -->
       <TodoItem
         ref="todoItem"
-        v-for="(item, i) in note.tasks"
+        v-for="(item, i) in note.todos"
         :key="i"
-        v-model="note.tasks[i]"
+        v-model="note.todos[i]"
         @delete="deleteTodo"
       />
 
@@ -127,7 +127,7 @@ export default {
     note: {
       id: null,
       title: null,
-      tasks: []
+      todos: []
     },
     currentStateId: 0,
     clonedStates: [],
@@ -214,12 +214,12 @@ export default {
     },
 
     async addTodo() {
-      if (this.note.tasks.length) {
+      if (this.note.todos.length) {
         // Add new to-do item to state with new id if
-        const id = this.note.tasks[this.note.tasks.length - 1].id + 1;
-        this.note.tasks.push({ id, title: "", value: "" });
+        const id = this.note.todos[this.note.todos.length - 1].id + 1;
+        this.note.todos.push({ id, title: "", value: "" });
       } else {
-        this.note.tasks.push({ id: 0, title: "", value: "" });
+        this.note.todos.push({ id: 0, title: "", value: "" });
       }
 
       await this.$nextTick();
@@ -230,8 +230,8 @@ export default {
     },
 
     deleteTodo(id) {
-      const index = this.note.tasks.findIndex(task => task.id === id);
-      this.note.tasks.splice(index, 1);
+      const index = this.note.todos.findIndex(task => task.id === id);
+      this.note.todos.splice(index, 1);
     }
   },
 
@@ -263,7 +263,7 @@ export default {
           this.note = {
             id: this.$store.getters.lastNoteId + 1,
             title: null,
-            tasks: []
+            todos: []
           };
         }
       }
