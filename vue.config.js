@@ -1,5 +1,5 @@
 module.exports = {
-  publicPath: "/",
+  publicPath: process.env.NODE_ENV === "production" ? "/todo-vue" : "/",
   chainWebpack: config => {
     const oneOfsMap = config.module.rule("scss").oneOfs.store;
     oneOfsMap.forEach(item => {
